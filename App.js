@@ -56,8 +56,7 @@ export default class App extends Component<Props> {
       try {
         await Tts.setDefaultLanguage(voices[0].language);
       } catch (err) {
-        // My Samsung S9 has always this error: "Language is not supported"
-        console.log(`setDefaultLanguage error `, err);
+      	console.log(`setDefaultLanguage error `, err);
       }
       await Tts.setDefaultVoice(voices[0].id);
       this.setState({
@@ -89,7 +88,6 @@ export default class App extends Component<Props> {
     try {
       await Tts.setDefaultLanguage(voice.language);
     } catch (err) {
-      // My Samsung S9 has always this error: "Language is not supported"
       console.log(`setDefaultLanguage error `, err);
     }
     await Tts.setDefaultVoice(voice.id);
@@ -107,21 +105,6 @@ export default class App extends Component<Props> {
   };
 
   render() {
-    /*
-     *       React Native TTS Example
-     *             |Read text|
-     *           Status: ready
-     *    Selected Voice: com.apple....
-     *      Speed: 0.50   ------o------
-     *      Pitch: 1.00   -----o-------
-     *  ________________________________
-     * | This is an example text        |
-     * |                                |
-     * |________________________________|
-     *           |de-DE - Anna|
-     *          |en-GB - Arthur|
-     *           |it-IT - Alice|
-     */
     return (
       <View style={styles.container}>
         <Text style={styles.title}>{`React Native TTS Example`}</Text>
@@ -214,4 +197,5 @@ width: 150
     width: "100%"
   }
 });
+
 

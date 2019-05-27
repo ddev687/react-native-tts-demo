@@ -198,4 +198,120 @@ width: 150
   }
 });
 
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ *
+ * @format
+ * @flow
+ */
+
+import React, {Component} from 'react';
+import {Platform, StyleSheet, Text, View} from 'react-native';
+import ImagePicker from 'react-native-image-crop-picker';
+import { VideoPlayer, Trimmer } from 'react-native-video-processing';
+
+export default class App extends Component<Props> {
+
+    state = {
+        path: ''
+    }
+    trimVideo() {
+        const options = {
+            startTime: 0,
+            endTime: 15,
+            quality: '1080x1920', // iOS only
+            saveToCameraRoll: true, // default is false // iOS only
+            saveWithCurrentDate: true, // default is false // iOS only
+        };
+        this.videoPlayerRef.trim(options)
+            .then((newSource) => {
+                debugger
+                this.setState({ path: `file://${newSource}` });
+                console.log(newSource)
+            })
+            .catch(console.warn);
+    }
+
+    compressVideo() {
+        const options = {
+            width: 720,
+            height: 1280,
+            bitrateMultiplier: 3,
+            saveToCameraRoll: true, // default is false, iOS only
+            saveWithCurrentDate: true, // default is false, iOS only
+            minimumBitrate: 300000,
+            removeAudio: true, // default is false
+        };
+        this.videoPlayerRef.compress(options)
+            .then((newSource) => console.log(newSource))
+            .catch(console.warn);
+    }
+
+    getPreviewImageForSecond(second) {
+        const maximumSize = { width: 640, height: 1024 }; // default is { width: 1080, height: 1080 } iOS only
+        this.videoPlayerRef.getPreviewForSecond(second, maximumSize) // maximumSize is iOS only
+            .then((base64String) => console.log('This is BASE64 of image', base64String))
+            .catch(console.warn);
+    }
+
+    getVideoInfo() {
+        this.videoPlayerRef.getVideoInfo()
+            .then((info) => console.log(info))
+            .catch(console.warn);
+    }
+
+    openGallery = (cropping, mediaType='video') => {
+        ImagePicker.openCamera({
+            //cropping: cropping,
+            width: 500,
+            height: 500,
+            //includeExif: true,
+            mediaType,
+        }).then(image => {
+            debugger
+            this.setState({ path: image.path });
+            this.trimVideo()
+            console.log('received image', image);
+            this.setState({
+                image: {uri: image.path, width: image.width, height: image.height, mime: image.mime},
+                images: null
+            });
+        }).catch(e => alert(e));
+    }
+
+  render() {
+    return (
+      <View style={styles.container}>
+          {this.state.path === '' && <Text style={styles.welcome} onPress={() => this.openGallery(true, 'video')}>Select Video</Text>}
+        <VideoPlayer
+          ref={ref => this.videoPlayerRef = ref}
+          //startTime={30}  // seconds
+          //endTime={120}   // seconds
+          play={true}     // default false
+          replay={true}   // should player play video again if it's ended
+          rotate={true}   // use this prop to rotate video if it captured in landscape mode iOS only
+          source={this.state.path}
+          playerWidth={600} // iOS only
+          playerHeight={500} // iOS only
+          style={{ flex: 1}}
+          //style={{ height: 500, width: 500 }}
+          resizeMode={VideoPlayer.Constants.resizeMode.STRETCH}
+          onChange={({ nativeEvent }) => console.log({ nativeEvent })} // get Current time on every second
+        />
+      </View>
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1
+  },
+  welcome: {
+    fontSize: 20,
+    textAlign: 'center',
+    margin: 10,
+  }
+});
 
